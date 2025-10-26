@@ -13,25 +13,25 @@ package org.com.pangolin.pipeline;
  * </p>
  * <p>
  * A utilização de bitmasks permite que a verificação de correspondência seja uma operação
- * de tempo constante O(1), o que é crucial para o desempenho do pipeline.
+ * de tempo constante $O(1)$, o que é crucial para o desempenho do pipeline.
  * </p>
  */
 public class Path {
     /**
-     * Máscara de bits para o Caminho A. Valor: 1 (0b001).
+     * Máscara de bits para o Caminho A. Valor: $2^0 = 1$ (0b001).
      */
     public static final int PATH_A = 1 << 0; // 0b001
     /**
-     * Máscara de bits para o Caminho B. Valor: 2 (0b010).
+     * Máscara de bits para o Caminho B. Valor: $2^1 = 2$ (0b010).
      */
     public static final int PATH_B = 1 << 1; // 0b010
     /**
-     * Máscara de bits para o Caminho C. Valor: 4 (0b100).
+     * Máscara de bits para o Caminho C. Valor: $2^2 = 4$ (0b100).
      */
     public static final int PATH_C = 1 << 2; // 0b100
     /**
      * Máscara de bits que representa todos os caminhos combinados (A, B e C).
-     * Útil para hooks que devem ser executados em qualquer caminho.
+     * Corresponde à operação de união $A \cup B \cup C$.
      */
     public static final int ALL = PATH_A | PATH_B | PATH_C;
 
@@ -55,13 +55,14 @@ public class Path {
     /**
      * Verifica se este caminho corresponde a uma determinada máscara de caminhos de um hook.
      * <p>
-     * A correspondência ocorre se houver pelo menos um bit em comum entre a máscara
-     * deste caminho e a máscara de caminhos do hook. A operação é realizada em tempo constante O(1).
+     * A correspondência é definida pela operação de interseção de bits. A condição para
+     * correspondência é que a interseção não seja vazia. Formalmente, a verificação é:
+     * $(mask \ \&\ hookPaths) \neq 0$.
+     * A operação é realizada em tempo constante $O(1)$.
      * </p>
      *
      * @param hookPaths A máscara de bits dos caminhos definidos para um hook.
-     * @return {@code true} se houver uma correspondência (interseção de bits não é zero),
-     *         {@code false} caso contrário.
+     * @return {@code true} se houver uma correspondência, {@code false} caso contrário.
      */
     public boolean matches(int hookPaths) {
         return (mask & hookPaths) != 0;

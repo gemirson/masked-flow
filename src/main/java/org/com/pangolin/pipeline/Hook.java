@@ -33,8 +33,7 @@ class Hook<T> implements Comparable<Hook<T>> {
      * @param name     O nome do hook, usado para identificação e depuração.
      * @param paths    A máscara de bits que define em quais caminhos ({@link Path}) este hook deve ser executado.
      * @param priority A prioridade de execução. Um valor menor indica uma prioridade maior.
-     * @param function A função que contém a lógica a ser executada. Ela recebe um contexto {@code T}
-     *                 e retorna um novo contexto {@code T}, que pode ter sido modificado.
+     * @param function A função que contém a lógica a ser executada. Ela pode ser expressa como $f: T \rightarrow T$.
      */
     public Hook(String name, int paths, int priority, Function<T, T> function) {
         this.name = name;
@@ -47,7 +46,7 @@ class Hook<T> implements Comparable<Hook<T>> {
      * Decide se este hook deve ser executado para um determinado {@link Path}.
      * <p>
      * A decisão é baseada na correspondência de bits entre o caminho fornecido e os caminhos
-     * associados a este hook. A verificação é uma operação O(1).
+     * associados a este hook. A verificação é uma operação de tempo constante $$O(1)$$.
      * </p>
      *
      * @param path O caminho de execução atual do pipeline.
@@ -60,8 +59,8 @@ class Hook<T> implements Comparable<Hook<T>> {
     /**
      * Executa a lógica do hook aplicando a função encapsulada ao contexto fornecido.
      *
-     * @param context O objeto de contexto atual do pipeline.
-     * @return O novo estado do contexto após a execução da função.
+     * @param context O objeto de contexto atual do pipeline, $c \in T$.
+     * @return O novo estado do contexto $c' = f(c)$, onde $c' \in T$.
      */
     public T execute(T context) {
         return function.apply(context);
@@ -84,13 +83,12 @@ class Hook<T> implements Comparable<Hook<T>> {
     /**
      * Compara este hook com outro com base em suas prioridades.
      * <p>
-     * A ordenação é natural: um hook com um valor de prioridade menor é considerado "menor"
-     * e, portanto, será executado antes de um hook com um valor de prioridade maior.
+     * A ordenação é definida pela prioridade $p$. Para dois hooks $h_1$ e $h_2$ com
+     * prioridades $p_1$ e $p_2$, a relação de ordem é $h_1 < h_2$ se $p_1 < p_2$.
      * </p>
      *
      * @param other O outro hook a ser comparado.
-     * @return Um valor negativo se a prioridade deste hook for menor que a do outro,
-     *         zero se forem iguais, ou um valor positivo se for maior.
+     * @return Um valor negativo se $p_1 < p_2$, zero se $p_1 = p_2$, ou um valor positivo se $p_1 > p_2$.
      */
     @Override
     public int compareTo(Hook<T> other) {

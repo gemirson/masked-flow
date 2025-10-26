@@ -19,10 +19,18 @@ public class Pipeline<T> {
 
     /**
      * Executa o pipeline com um contexto inicial fortemente tipado.
-     * Complexidade: O(n), onde n é o número de hooks. Decisão por hook: O(1).
+     * <p>
+     * A complexidade temporal é $O(n)$, onde $n$ é o número total de hooks no pipeline.
+     * A decisão de execução para cada hook individual é $O(1)$.
+     * </p>
+     * <p>
+     * Para um contexto inicial $c_0$ e uma lista ordenada de hooks aplicáveis $[h_1, h_2, ..., h_k]$,
+     * o contexto final $c_k$ é o resultado da composição de funções:
+     * $c_k = (h_k \circ h_{k-1} \circ ... \circ h_1)(c_0)$.
+     * </p>
      * @param path O caminho a ser avaliado para decidir se um hook deve ser executado.
-     * @param initialContext O contexto inicial que será passado para o primeiro hook.
-     * @return O contexto após a execução de todos os hooks aplicáveis.
+     * @param initialContext O contexto inicial, $c_0$.
+     * @return O contexto final, $c_k$, após a execução de todos os hooks aplicáveis.
      */
     public T execute(Path path, T initialContext) {
         T currentContext = initialContext;
@@ -35,7 +43,7 @@ public class Pipeline<T> {
     }
 
     /**
-     * Retorna o número de hooks registrados neste pipeline.
+     * Retorna o número de hooks registrados neste pipeline, $n$.
      *
      * @return o número de hooks.
      */
@@ -55,7 +63,7 @@ public class Pipeline<T> {
          * @param name o nome do hook, para identificação.
          * @param paths uma máscara de bits representando os caminhos em que este hook deve ser executado.
          * @param priority a prioridade de execução do hook. Menor valor indica maior prioridade.
-         * @param fn a função que representa a lógica do hook.
+         * @param fn a função que representa a lógica do hook, formalmente $f: T \rightarrow T$.
          * @return o próprio Builder, para encadeamento de chamadas (fluent interface).
          */
         public Builder<T> register(String name, int paths, int priority, Function<T, T> fn) {
@@ -65,8 +73,11 @@ public class Pipeline<T> {
 
         /**
          * Constrói o pipeline.
-         * A construção envolve a ordenação dos hooks com base em sua prioridade
-         * e a criação de uma lista imutável para garantir a segurança e a consistência do pipeline.
+         * <p>
+         * A construção tem uma complexidade de $O(n \log n)$ devido à ordenação dos hooks,
+         * onde $n$ é o número de hooks registrados. Após a ordenação, a lista de hooks
+         * torna-se imutável para garantir a consistência do pipeline.
+         * </p>
          *
          * @return uma nova instância imutável de {@link Pipeline}.
          */
